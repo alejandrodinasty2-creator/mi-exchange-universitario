@@ -25,7 +25,7 @@
                     <input type="password" id="login-pass" value="123456">
                 </div>
             </div>
-            <button class="btn-submit" onclick="ejecutarLogin()" style="margin-top: 15px;">Ingresar al Exchange</button>
+            <button class="btn-submit" id="btn-submit-login" style="margin-top: 15px;">Ingresar al Exchange</button>
         </div>
     </div>
 
@@ -36,8 +36,8 @@
             <div class="header-left">
                 <div class="logo">NOVA<span>EX</span></div>
                 <div class="nav-tabs">
-                    <div id="tab-btn-spot" class="nav-item active" onclick="cambiarVistaPrincipal('spot')">Trading Spot</div>
-                    <div id="tab-btn-wallet" class="nav-item" onclick="cambiarVistaPrincipal('wallet')">Mi Billetera</div>
+                    <div id="tab-btn-spot" class="nav-item active">Trading Spot</div>
+                    <div id="tab-btn-wallet" class="nav-item">Mi Billetera</div>
                 </div>
             </div>
             <div class="header-right crypto-mono">
@@ -113,7 +113,7 @@
                 </aside>
             </div>
 
-            <!-- INTERFAZ DE BILLETERA CON NUEVA MONEDA EN SOLES -->
+            <!-- INTERFAZ DE BILLETERA CON MONEDA EN SOLES -->
             <div id="view-wallet-panel" class="sub-interface-view" style="display: none; width: 100%; padding: 30px; background-color: #14151A; overflow-y: auto;">
                 <h2 style="margin-top: 0; color: #F3BA2F;">Resumen de la Billetera (Spot & Funding)</h2>
                 <p style="color: #848E9C;">Balance Estimado Total</p>
@@ -137,7 +137,6 @@
                             <td id="table-avail-btc">0.0000</td>
                             <td id="table-value-btc">$0.00</td>
                         </tr>
-                        <!-- FILA DE PAGO OBTENIDO EN SOLES -->
                         <tr style="border-top: 1px dashed #2B3139; background-color: rgba(14, 203, 129, 0.05);">
                             <td style="font-weight: bold; color: #0ECB81;">Pago Obtenido (PEN)</td>
                             <td style="color: #0ECB81; font-weight: bold;">500.00</td>
@@ -151,7 +150,121 @@
         </div>
     </div>
 
-    <script src="mercado.js"></script>
-    <script src="billetera.js"></script>
-</body>
-</html>
+    <!-- LÓGICA DE CONTROL UNIFICADA INTEGRADA -->
+    <script>
+        // Variables globales financieras de la sesión
+        let precioBitcoinActual = 64215.80;
+        let saldoUSDT = 10000.00;
+        let saldoBTC = 0.0000;
+
+        // Esperar a que la página cargue por completo para activar los escuchadores
+        window.addEventListener('DOMContentLoaded', () => {
+            
+            // CONFIGURACIÓN DEL BOTÓN DE INICIO DE SESIÓN
+            document.getElementById('btn-submit-login').addEventListener('click', () => {
+                const usuario = document.getElementById('login-user').value;
+                if(usuario.trim() === "") {
+                    alert("Por favor introduce un correo de usuario universitario.");
+                    return;
+                }
+                document.getElementById('user-display-name').innerText = usuario;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-exchange-interface').style.display = 'block';
+                
+                inicializarGraficoSimulado();
+            });
+
+            // CONFIGURACIÓN DE PESTAÑAS DE NAVEGACIÓN
+            document.getElementById('tab-btn-spot').addEventListener('click', () => {
+                document.getElementById('tab-btn-spot').classList.add('active');
+document.getElementById('tab-btn-wallet').classList.remove('active');
+document.getElementById('view-trading-spot').style.display = 'flex';
+document.getElementById('view-wallet-panel').style.display = 'none';
+});
+document.getElementById('tab-btn-wallet').addEventListener('click', () => {
+document.getElementById('tab-btn-spot').classList.remove('active');
+document.getElementById('tab-btn-wallet').classList.add('active');
+document.getElementById('view-trading-spot').style.display = 'none';
+document.getElementById('view-wallet-panel').style.display = 'block';
+actualizarPantallaBilleteraCompleta();
+});
+// CONFIGURACIÓN DEL MOTOR DE COMPRA DE CRIPTO
+document.getElementById('btn-execute-trade').addEventListener('click', () => {
+const inputCantidad = document.getElementById('form-amount-input');
+const cantidadAComprar = parseFloat(inputCantidad.value);
+if (isNaN(cantidadAComprar) || cantidadAComprar <= 0) {
+alert("Por favor, ingresa una cantidad válida.");
+return;
+}
+const costoTotal = precioBitcoinActual * cantidadAComprar;
+if (saldoUSDT >= costoTotal) {
+saldoUSDT = saldoUSDT - costoTotal;
+saldoBTC = saldoBTC + cantidadAComprar;
+actualizarPantallaBilleteraCompleta();
+// Insertar fila en el historial
+const tablaBody = document.getElementById('history-table-body');
+const horaActual = new Date().toLocaleTimeString();
+const nuevaFila = `
+${horaActual}
+COMPRA
+$${precioBitcoinActual.toFixed(2)}
+${cantidadAComprar.toFixed(4)} BTC
+$${costoTotal.toFixed(2)} USDT
+`;
+tablaBody.innerHTML = nuevaFila + tablaBody.innerHTML;
+inputCantidad.value = '';
+alert("¡Compra Exitosa!\nHas añadido fondos a tu cartera Spot.");
+} else {
+alert("Error: Fondos Insuficientes en tu saldo actual.");
+}
+});
+// CONTROLADOR DEL MERCADO EN TIEMPO REAL
+setInterval(() => {
+const variacion = (Math.random() * 12 - 6);
+precioBitcoinActual = parseFloat((precioBitcoinActual + variacion).toFixed(2));
+const colorTexto = variacion >= 0 ? '#0ECB81' : '#F6465D';
+if (document.getElementById('live-price-indicator')) {
+document.getElementById('live-price-indicator').innerText = '$' + precioBitcoinActual.toFixed(2);
+document.getElementById('live-price-indicator').style.color = colorTexto;
+}
+if (document.getElementById('top-bar-price')) {
+document.getElementById('top-bar-price').innerText = '$' + precioBitcoinActual.toFixed(2);
+document.getElementById('top-bar-price').style.color = colorTexto;
+}
+if (document.getElementById('form-price-input')) {
+document.getElementById('form-price-input').value = precioBitcoinActual.toFixed(2);
+}
+// Mover gráfico dinámico
+const barras = document.querySelectorAll('.chart-bar');
+if(barras.length > 0) {
+const barraAleatoria = barras[Math.floor(Math.random() * barras.length)];
+barraAleatoria.style.height = (Math.floor(Math.random() * 70) + 15) + '%';
+barraAleatoria.style.background = variacion >= 0 ? '#0ECB81' : '#F6465D';
+}
+}, 2000);
+});
+// FUNCIONES COMPLEMENTARIAS
+function actualizarPantallaBilleteraCompleta() {
+const valorConvertidoBTC = saldoBTC * precioBitcoinActual;
+const balanceTotalEstimado = saldoUSDT + valorConvertidoBTC + 133.33;
+document.getElementById('wallet-total-est').innerText = '$' + balanceTotalEstimado.toFixed(2) + ' USDT';
+document.getElementById('table-balance-usdt').innerText = saldoUSDT.toFixed(2);
+document.getElementById('table-avail-usdt').innerText = saldoUSDT.toFixed(2);
+document.getElementById('table-value-usdt').innerText = '$' + saldoUSDT.toFixed(2);
+document.getElementById('table-balance-btc').innerText = saldoBTC.toFixed(4);
+document.getElementById('table-avail-btc').innerText = saldoBTC.toFixed(4);
+document.getElementById('table-value-btc').innerText = '$' + valorConvertidoBTC.toFixed(2);
+document.querySelectorAll('.wallet-usdt-display').forEach(el => {
+el.innerText = '$' + saldoUSDT.toFixed(2) + ' USDT';
+});
+}
+function inicializarGraficoSimulado() {
+const chartBox = document.getElementById('mock-chart-visual');
+if(!chartBox) return;
+chartBox.innerHTML = "";
+for(let i=0; i<15; i++) {
+const alturaAleatoria = Math.floor(Math.random() * 70) + 15;
+const colorBarra = Math.random() > 0.4 ? '#0ECB81' : '#F6465D';
+chartBox.innerHTML += <div class="chart-bar" style="height: ${alturaAleatoria}%; background-color: ${colorBarra}; width: 100%; flex: 1; min-height: 5px; transition: height 0.5s ease;"></div>;
+}
+}
