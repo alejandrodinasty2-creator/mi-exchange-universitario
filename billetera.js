@@ -38,8 +38,10 @@ function cambiarVistaPrincipal(nombreVista) {
 
 // ACTUALIZACIÓN DE LOS CUADROS Y TABLAS DE LA BILLETERA
 function actualizarPantallaBilleteraCompleta() {
-    const valorConvertidoBTC = saldoBTC * precioBitcoinActual;
-    const balanceTotalEstimado = saldoUSDT + valorConvertidoBTC;
+        const valorConvertidoBTC = saldoBTC * precioBitcoinActual;
+    const pagoSolesEnUSDT = 133.33; // Equivalente estimado de 500 Soles para el proyecto
+    const balanceTotalEstimado = saldoUSDT + valorConvertidoBTC + pagoSolesEnUSDT;
+
     
     // Actualizar textos de la vista de Billetera
     document.getElementById('wallet-total-est').innerText = '$' + balanceTotalEstimado.toFixed(2) + ' USDT';
