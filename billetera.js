@@ -1,9 +1,9 @@
-/* billetera.js */
+/* billetera.js - Versión Completa Corregida */
 
-let saldoUSDT = 5000.00;
+let saldoUSDT = 10000.00;
 let saldoBTC = 0.0000;
 
-// FUNCION DE LOGIN INTERACTIVO
+// FUNCIÓN DE LOGIN INTERACTIVO
 function ejecutarLogin() {
     const usuario = document.getElementById('login-user').value;
     if(usuario.trim() === "") {
@@ -14,11 +14,11 @@ function ejecutarLogin() {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('main-exchange-interface').style.display = 'block';
     
-    // Generar barras iniciales del grafico una vez logueado
+    // Arrancar el gráfico simulado
     inicializarGraficoSimulado();
 }
 
-// FUNCION PARA INTERACTUAR CON LAS PESTAÑAS (CAMBIAR DE PANTALLA)
+// FUNCIÓN PARA INTERACTUAR CON LAS PESTAÑAS
 function cambiarVistaPrincipal(nombreVista) {
     document.getElementById('tab-btn-spot').classList.remove('active');
     document.getElementById('tab-btn-wallet').classList.remove('active');
@@ -38,10 +38,9 @@ function cambiarVistaPrincipal(nombreVista) {
 
 // ACTUALIZACIÓN DE LOS CUADROS Y TABLAS DE LA BILLETERA
 function actualizarPantallaBilleteraCompleta() {
-        const valorConvertidoBTC = saldoBTC * precioBitcoinActual;
-    const pagoSolesEnUSDT = 133.33; // Equivalente estimado de 500 Soles para el proyecto
+    const valorConvertidoBTC = saldoBTC * precioBitcoinActual;
+    const pagoSolesEnUSDT = 133.33; // Equivalente aproximado de 500 Soles en dólares
     const balanceTotalEstimado = saldoUSDT + valorConvertidoBTC + pagoSolesEnUSDT;
-
     
     // Actualizar textos de la vista de Billetera
     document.getElementById('wallet-total-est').innerText = '$' + balanceTotalEstimado.toFixed(2) + ' USDT';
@@ -53,7 +52,7 @@ function actualizarPantallaBilleteraCompleta() {
     document.getElementById('table-avail-btc').innerText = saldoBTC.toFixed(4);
     document.getElementById('table-value-btc').innerText = '$' + valorConvertidoBTC.toFixed(2);
     
-    // Actualizar pantallas de acceso rapido en la zona de trading
+    // Actualizar pantallas de acceso rápido en la zona de trading
     document.querySelectorAll('.wallet-usdt-display').forEach(el => {
         el.innerText = '$' + saldoUSDT.toFixed(2) + ' USDT';
     });
@@ -112,7 +111,7 @@ function inicializarGraficoSimulado() {
     }
 }
 
-// ACTUALIZAR GRÁFICO CUANDO CAMBIE EL MERCADO (Lamada desde mercado.js)
+// ACTUALIZAR GRÁFICO CUANDO CAMBIE EL MERCADO
 function actualizarGraficoEnVivo(sube) {
     const barras = document.querySelectorAll('.chart-bar');
     if(barras.length === 0) return;
@@ -120,6 +119,11 @@ function actualizarGraficoEnVivo(sube) {
     const nuevaAltura = Math.floor(Math.random() * 70) + 15;
     barraAleatoria.style.height = nuevaAltura + '%';
     barraAleatoria.style.background = sube ? '#0ECB81' : '#F6465D';
+}
+
+document.getElementById('btn-execute-trade').addEventListener('click', procesarCompraCripto);
+actualizarPantallaBilleteraCompleta();
+
 }
 
 document.getElementById('btn-execute-trade').addEventListener('click', procesarCompraCripto);
