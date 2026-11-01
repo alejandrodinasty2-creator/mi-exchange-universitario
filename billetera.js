@@ -1,6 +1,6 @@
 /* billetera.js - Versión Completa Corregida */
 
-let saldoUSDT = 10000.00;
+let saldoUSDT = 5000.00;
 let saldoBTC = 0.0000;
 
 // FUNCIÓN DE LOGIN INTERACTIVO
