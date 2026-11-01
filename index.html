@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaExchange - Terminal Universitaria Avanzada</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <!-- 1. PANTALLA DE INICIO DE SESIÓN (LOGIN OBLIGATORIO) -->
+    <div id="login-screen" class="login-overlay">
+        <div class="login-card">
+            <h2 style="color: #F3BA2F; margin-top: 0; text-align: center;">Iniciar Sesión</h2>
+            <p style="color: #848E9C; text-align: center; margin-bottom: 20px;">Proyecto Universitario - Acceso Simulado</p>
+            <div class="form-group">
+                <label>Usuario Universitario</label>
+                <div class="input-wrapper">
+                    <input type="text" id="login-user" placeholder="ejemplo@universidad.edu">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <div class="input-wrapper">
+                    <input type="password" id="login-pass" value="123456">
+                </div>
+            </div>
+            <button class="btn-submit" onclick="ejecutarLogin()" style="margin-top: 15px;">Ingresar al Exchange</button>
+        </div>
+    </div>
+
+    <!-- 2. INTERFAZ PRINCIPAL DE LA APLICACIÓN (OCULTA HASTA LOGUEARSE) -->
+    <div id="main-exchange-interface" style="display: none;">
+        
+        <!-- BARRA SUPERIOR (HEADER INTERACTIVO) -->
+        <header>
+            <div class="header-left">
+                <div class="logo">NOVA<span>Exchange</span></div>
+                <div class="nav-tabs">
+                    <div id="tab-btn-spot" class="nav-item active" onclick="cambiarVistaPrincipal('spot')">Trading Spot</div>
+                    <div id="tab-btn-wallet" class="nav-item" onclick="cambiarVistaPrincipal('wallet')">Mi Billetera</div>
+                </div>
+            </div>
+            <div class="header-right crypto-mono">
+                <div style="margin-right: 15px; color: #848E9C;">Usuario: <span id="user-display-name" style="color: #FFF;"></span></div>
+                <div>BTC/USDT: <span id="top-bar-price" style="color: #0ECB81; font-weight: bold;">$64,215.80</span></div>
+            </div>
+        </header>
+
+        <!-- LAYOUT DE CONTENIDO -->
+        <div class="layout-container">
+            
+            <!-- VISTA A: PANEL DE TRADING SPOT -->
+            <div id="view-trading-spot" class="sub-interface-view" style="display: flex; width: 100%;">
+                
+                <!-- COLUMNA IZQUIERDA: LIBRO DE ÓRDENES -->
+                <aside class="col-left">
+                    <div class="panel-title">Libro de Órdenes (En vivo)</div>
+                    <div class="crypto-mono text-sell">
+                        <div class="order-row" style="color: #848E9C; font-size: 10px; font-weight: bold;">
+                            <span>Precio (USDT)</span>
+                            <span>Cantidad (BTC)</span>
+                        </div>
+                        <div class="order-row"><span>64,225.00</span><span>0.4152</span></div>
+                        <div class="order-row"><span>64,220.00</span><span>1.1893</span></div>
+                        <div class="order-row"><span>64,218.50</span><span>0.5500</span></div>
+                    </div>
+                    <div class="price-center crypto-mono" id="live-price-indicator">$64,215.80</div>
+                    <div class="crypto-mono text-buy">
+                        <div class="order-row"><span>64,210.00</span><span>0.8841</span></div>
+                        <div class="order-row"><span>64,205.00</span><span>2.6150</span></div>
+                        <div class="order-row"><span>64,198.10</span><span>0.0932</span></div>
+                    </div>
+                </aside>
+
+                <!-- COLUMNA CENTRAL: GRÁFICO SIMULADO E HISTORIAL -->
+                <main class="col-center">
+                    <div class="chart-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #14151A; position: relative;">
+                        <div style="position: absolute; top: 15px; left: 15px; color: #848E9C; font-weight: bold;">Gráfico BTC/USDT (Generación Dinámica)</div>
+                        <div id="mock-chart-visual" style="display: flex; align-items: flex-end; gap: 8px; width: 80%; height: 60%; margin-top: 20px;">
+                            <!-- Las barras del gráfico se generarán dinámicamente con JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="positions-box" style="overflow-y: auto;">
+                        <div class="panel-title" style="border-bottom: 1px solid #2B3139; padding-bottom: 6px;">Historial de Operaciones</div>
+                        <table class="history-table">
+                            <thead>
+                                <tr><th>Hora</th><th>Tipo</th><th>Precio</th><th>Cantidad</th><th>Total</th></tr>
+                            </thead>
+                            <tbody id="history-table-body" class="crypto-mono"></tbody>
+                        </table>
+                    </div>
+                </main>
+
+                <!-- COLUMNA DERECHA: FORMULARIO -->
+                <aside class="col-right">
+                    <div>
+                        <div class="action-tabs"><div class="btn-buy-tab">Comprar</div></div>
+                        <div class="form-group">
+                            <label>Precio del Bitcoin (USDT)</label>
+                            <div class="input-wrapper">
+                                <input type="text" value="64215.80" class="crypto-mono" id="form-price-input" readonly>
+                                <span class="input-currency">USDT</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad a comprar</label>
+                            <div class="input-wrapper">
+                                <input type="number" placeholder="0.01" step="0.01" class="crypto-mono" id="form-amount-input">
+                                <span class="input-currency">BTC</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px; padding: 10px; background-color: rgba(43,49,57,0.2); border-radius: 4px;">
+                            <div style="color: #848E9C; margin-bottom: 4px;">Disponible en Balances Rápidos:</div>
+                            <div class="crypto-mono wallet-usdt-display" style="color: #F3BA2F; font-size: 13px;">$10,000.00 USDT</div>
+                        </div>
+                    </div>
+                    <button class="btn-submit" id="btn-execute-trade">Ejecutar Compra de Prueba</button>
+                </aside>
+            </div>
+
+            <!-- VISTA B: INTERFAZ COMPLETA DE BILLETERA (OCULTA POR DEFECTO) -->
+            <div id="view-wallet-panel" class="sub-interface-view" style="display: none; width: 100%; padding: 30px; background-color: #14151A; overflow-y: auto;">
+                <h2 style="margin-top: 0; color: #F3BA2F;">Resumen de la Billetera (Spot & Funding)</h2>
+                <p style="color: #848E9C;">Balance Estimado Total</p>
+                <div style="font-size: 24px; font-weight: bold; margin-bottom: 30px;" id="wallet-total-est" class="crypto-mono">$10,000.00 USDT</div>
+                
+                <h3 style="border-bottom: 1px solid #2B3139; padding-bottom: 10px; color: #FFF;">Lista de Activos en Cuenta</h3>
+                <table class="history-table" style="font-size: 14px;">
+                    <thead>
+                        <tr><th>Activo</th><th>Saldo Total</th><th>Disponible</th><th>Valor en USDT</th></tr>
+                    </thead>
+                    <tbody class="crypto-mono">
+                        <tr>
+                            <td style="font-weight: bold; color: #F3BA2F;">USDT</td>
+                            <td id="table-balance-usdt">10000.00</td>
+                            <td id="table-avail-usdt">10000.00</td>
+                            <td id="table-value-usdt">$10000.00</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold; color: #FFF;">BTC</td>
+                            <td id="table-balance-btc">0.0000</td>
+                            <td id="table-avail-btc">0.0000</td>
+                            <td id="table-value-btc">$0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="mercado.js"></script>
+    <script src="billetera.js"></script>
+</body>
+</html>
