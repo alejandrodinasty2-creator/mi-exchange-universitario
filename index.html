@@ -11,8 +11,8 @@
     <!-- PANTALLA DE INICIO DE SESIÓN -->
     <div id="login-screen" class="login-overlay">
         <div class="login-card">
-            <h2 style="color: #F3BA2F; margin-top: 0; text-align: center;">Iniciar Sesión</h2>
-            <p style="color: #848E9C; text-align: center; margin-bottom: 20px;">Proyecto Universitario - Acceso Simulado</p>
+            <h2 style="color: #F3BA2F; margin-top: 0; text-align: center; font-family: Arial, sans-serif;">Iniciar Sesión</h2>
+            <p style="color: #848E9C; text-align: center; margin-bottom: 20px; font-family: Arial, sans-serif;">Proyecto Universitario - Acceso Simulado</p>
             <div class="form-group">
                 <label>Usuario Universitario</label>
                 <div class="input-wrapper">
@@ -137,6 +137,7 @@
                             <td id="table-avail-btc">0.0000</td>
                             <td id="table-value-btc">$0.00</td>
                         </tr>
+                        <!-- FILA DE PAGO OBTENIDO EN SOLES -->
                         <tr style="border-top: 1px dashed #2B3139; background-color: rgba(14, 203, 129, 0.05);">
                             <td style="font-weight: bold; color: #0ECB81;">Pago Obtenido (PEN)</td>
                             <td style="color: #0ECB81; font-weight: bold;">500.00</td>
@@ -150,46 +151,45 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE CONTROL UNIFICADA INTEGRADA -->
     <script>
-        // Variables globales financieras de la sesión
         let precioBitcoinActual = 64215.80;
         let saldoUSDT = 10000.00;
         let saldoBTC = 0.0000;
 
-        // Esperar a que la página cargue por completo para activar los escuchadores
         window.addEventListener('DOMContentLoaded', () => {
             
-            // CONFIGURACIÓN DEL BOTÓN DE INICIO DE SESIÓN
-            document.getElementById('btn-submit-login').addEventListener('click', () => {
+            // PROGRAMACIÓN EXPLICITA DEL BOTÓN DE ACCESO
+            document.getElementById('btn-submit-login').onclick = function() {
                 const usuario = document.getElementById('login-user').value;
                 if(usuario.trim() === "") {
                     alert("Por favor introduce un correo de usuario universitario.");
                     return;
                 }
                 document.getElementById('user-display-name').innerText = usuario;
-                document.getElementById('login-screen').style.display = 'none';
+                
+                // Forzamos el cambio de visibilidad ocultando el bloqueo y mostrando la app
+                document.getElementById('login-screen').style.setProperty('display', 'none', 'important');
                 document.getElementById('main-exchange-interface').style.display = 'block';
                 
                 inicializarGraficoSimulado();
-            });
+            };
 
-            // CONFIGURACIÓN DE PESTAÑAS DE NAVEGACIÓN
-            document.getElementById('tab-btn-spot').addEventListener('click', () => {
+            // INTERCAMBIO DE PANTALLAS
+            document.getElementById('tab-btn-spot').onclick = function() {
                 document.getElementById('tab-btn-spot').classList.add('active');
 document.getElementById('tab-btn-wallet').classList.remove('active');
 document.getElementById('view-trading-spot').style.display = 'flex';
 document.getElementById('view-wallet-panel').style.display = 'none';
-});
-document.getElementById('tab-btn-wallet').addEventListener('click', () => {
+};
+document.getElementById('tab-btn-wallet').onclick = function() {
 document.getElementById('tab-btn-spot').classList.remove('active');
 document.getElementById('tab-btn-wallet').classList.add('active');
 document.getElementById('view-trading-spot').style.display = 'none';
 document.getElementById('view-wallet-panel').style.display = 'block';
 actualizarPantallaBilleteraCompleta();
-});
-// CONFIGURACIÓN DEL MOTOR DE COMPRA DE CRIPTO
-document.getElementById('btn-execute-trade').addEventListener('click', () => {
+};
+// EJECUCIÓN DE COMPRAS
+document.getElementById('btn-execute-trade').onclick = function() {
 const inputCantidad = document.getElementById('form-amount-input');
 const cantidadAComprar = parseFloat(inputCantidad.value);
 if (isNaN(cantidadAComprar) || cantidadAComprar <= 0) {
@@ -201,7 +201,6 @@ if (saldoUSDT >= costoTotal) {
 saldoUSDT = saldoUSDT - costoTotal;
 saldoBTC = saldoBTC + cantidadAComprar;
 actualizarPantallaBilleteraCompleta();
-// Insertar fila en el historial
 const tablaBody = document.getElementById('history-table-body');
 const horaActual = new Date().toLocaleTimeString();
 const nuevaFila = `
@@ -215,10 +214,10 @@ tablaBody.innerHTML = nuevaFila + tablaBody.innerHTML;
 inputCantidad.value = '';
 alert("¡Compra Exitosa!\nHas añadido fondos a tu cartera Spot.");
 } else {
-alert("Error: Fondos Insuficientes en tu saldo actual.");
+alert("Error: Fondos Insuficientes.");
 }
-});
-// CONTROLADOR DEL MERCADO EN TIEMPO REAL
+};
+// FLUCTUACIÓN DEL MERCADO
 setInterval(() => {
 const variacion = (Math.random() * 12 - 6);
 precioBitcoinActual = parseFloat((precioBitcoinActual + variacion).toFixed(2));
@@ -234,7 +233,6 @@ document.getElementById('top-bar-price').style.color = colorTexto;
 if (document.getElementById('form-price-input')) {
 document.getElementById('form-price-input').value = precioBitcoinActual.toFixed(2);
 }
-// Mover gráfico dinámico
 const barras = document.querySelectorAll('.chart-bar');
 if(barras.length > 0) {
 const barraAleatoria = barras[Math.floor(Math.random() * barras.length)];
@@ -243,7 +241,6 @@ barraAleatoria.style.background = variacion >= 0 ? '#0ECB81' : '#F6465D';
 }
 }, 2000);
 });
-// FUNCIONES COMPLEMENTARIAS
 function actualizarPantallaBilleteraCompleta() {
 const valorConvertidoBTC = saldoBTC * precioBitcoinActual;
 const balanceTotalEstimado = saldoUSDT + valorConvertidoBTC + 133.33;
